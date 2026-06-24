@@ -229,10 +229,17 @@ export default function App() {
       </section>
 
       {/* Marquee */}
-      <div className="w-full border-y border-white/10 py-4 overflow-hidden flex whitespace-nowrap bg-black relative z-10">
-        <div className="flex animate-marquee text-eyebrow space-x-12">
-          {Array(10).fill("LUTS — PRESETS — POWERGRADE — COLORFLOW™ — SFX — COLORLAB — TÍTULOS — ").map((t, i) => (
-            <span key={i}>{t}</span>
+      <div className="w-full border-y border-white/10 py-4 overflow-hidden bg-black relative z-10">
+        <div className="marquee-track">
+          {[0, 1].map((copy) => (
+            <div key={copy} className="marquee-group" aria-hidden={copy === 1}>
+              {["LUTS", "PRESETS", "POWERGRADE", "COLORFLOW™", "SFX", "COLORLAB", "TÍTULOS"].map((item) => (
+                <span key={item} className="text-eyebrow flex items-center">
+                  <span className="px-8">{item}</span>
+                  <span className="text-white/20">—</span>
+                </span>
+              ))}
+            </div>
           ))}
         </div>
       </div>
