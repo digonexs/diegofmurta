@@ -5,43 +5,43 @@ const products = [
   {
     id: 1,
     name: "LUTs Pack",
-    category: "Color Grading",
-    price: "$29.90",
+    category: "Correção de Cor",
+    price: "R$149,90",
     gradient: "linear-gradient(135deg, #111827 0%, #064e3b 100%)",
   },
   {
     id: 2,
     name: "BenizGrade",
-    category: "Color Grading",
-    price: "$59.90",
+    category: "Correção de Cor",
+    price: "R$299,90",
     gradient: "linear-gradient(135deg, #450a0a 0%, #1e1b4b 100%)",
   },
   {
     id: 3,
     name: "ColorFlow™",
-    category: "Color Grading",
-    price: "$49.90",
+    category: "Correção de Cor",
+    price: "R$249,90",
     gradient: "linear-gradient(135deg, #022c22 0%, #000000 100%)",
   },
   {
     id: 4,
     name: "Lightroom Presets Pack",
-    category: "Photo Editing",
-    price: "$24.90",
+    category: "Edição de Foto",
+    price: "R$124,90",
     gradient: "linear-gradient(135deg, #1c1917 0%, #1e3a8a 100%)",
   },
   {
     id: 5,
     name: "Cinematic Title Templates",
-    category: "Motion & Titles",
-    price: "$12.90",
+    category: "Motion & Títulos",
+    price: "R$64,90",
     gradient: "linear-gradient(135deg, #27272a 0%, #171717 100%)",
   },
   {
     id: 6,
     name: "SFX Library",
-    category: "Motion & Titles",
-    price: "$19.90",
+    category: "Motion & Títulos",
+    price: "R$99,90",
     gradient: "linear-gradient(135deg, #09090b 0%, #262626 100%)",
   },
 ];
@@ -202,8 +202,8 @@ export default function App() {
           <span className="w-1.5 h-1.5 rounded-full bg-accent mt-1" />
         </div>
         <div className="hidden md:flex gap-8 text-eyebrow">
-          <a href="#products" className="hover:text-muted transition-colors duration-300" data-testid="link-nav-products">PRODUCTS</a>
-          <a href="#bundles" className="hover:text-muted transition-colors duration-300" data-testid="link-nav-bundles">BUNDLES</a>
+          <a href="#products" className="hover:text-muted transition-colors duration-300" data-testid="link-nav-products">PRODUTOS</a>
+          <a href="#bundles" className="hover:text-muted transition-colors duration-300" data-testid="link-nav-bundles">PACOTES</a>
           <a href="#colorlab" className="hover:text-muted transition-colors duration-300" data-testid="link-nav-colorlab">COLORLAB</a>
         </div>
       </nav>
@@ -217,12 +217,12 @@ export default function App() {
         
         <div className="relative z-10 max-w-7xl">
           <Reveal>
-            <div className="text-eyebrow mb-6 text-accent">THE DIGITAL ATELIER</div>
+            <div className="text-eyebrow mb-6 text-accent">O ATELIÊ DIGITAL</div>
             <h1 className="text-hero mb-8">
               COLOR.<br />GRADE.<br />CREATE.
             </h1>
             <p className="text-body max-w-[42ch]">
-              A curated collection of premium tools from a working director. Built for obsessive cinematic creators who want exact science, not guesswork.
+              Uma coleção curada de ferramentas premium de um diretor em atividade. Feita para criadores cinematográficos que exigem ciência exata, não achismos.
             </p>
           </Reveal>
         </div>
@@ -231,7 +231,7 @@ export default function App() {
       {/* Marquee */}
       <div className="w-full border-y border-white/10 py-4 overflow-hidden flex whitespace-nowrap bg-black relative z-10">
         <div className="flex animate-marquee text-eyebrow space-x-12">
-          {Array(10).fill("LUTS — PRESETS — POWERGRADE — COLORFLOW™ — SFX — COLORLAB — TITLES — ").map((t, i) => (
+          {Array(10).fill("LUTS — PRESETS — POWERGRADE — COLORFLOW™ — SFX — COLORLAB — TÍTULOS — ").map((t, i) => (
             <span key={i}>{t}</span>
           ))}
         </div>
@@ -241,8 +241,8 @@ export default function App() {
       <section id="products" className="px-[var(--spacing-pad)] py-32 bg-black relative z-10">
         <Reveal>
           <BeforeAfter />
-          <div className="text-eyebrow mb-4 text-accent">THE COLLECTION</div>
-          <h2 className="text-section mb-16">DIGITAL TOOLS</h2>
+          <div className="text-eyebrow mb-4 text-accent">A COLEÇÃO</div>
+          <h2 className="text-section mb-16">FERRAMENTAS DIGITAIS</h2>
         </Reveal>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
@@ -267,7 +267,7 @@ export default function App() {
                       className="pill-bg px-6 py-2 rounded-full text-sm font-bold tracking-tight opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 hover:bg-white hover:text-black"
                       data-testid={`button-get-${product.id}`}
                     >
-                      Get this →
+                      Adquirir →
                     </button>
                   </div>
                 </div>
@@ -287,21 +287,21 @@ export default function App() {
             </div>
             
             <div>
-              <div className="text-eyebrow mb-6 text-accent">BUNDLE</div>
+              <div className="text-eyebrow mb-6 text-accent">PACOTE</div>
               <h2 className="text-section mb-6">CREATOR'S<br/>ESSENTIALS</h2>
               <div className="flex items-center gap-4 mb-8">
-                <span className="text-4xl font-bold">$89.90</span>
-                <span className="text-muted line-through">$226.29</span>
-                <span className="pill-bg px-3 py-1 text-xs font-bold text-accent rounded-full border border-white/10">SAVE 60%</span>
+                <span className="text-4xl font-bold">R$449,90</span>
+                <span className="text-muted line-through">R$1.129,90</span>
+                <span className="pill-bg px-3 py-1 text-xs font-bold text-accent rounded-full border border-white/10">60% OFF</span>
               </div>
               <p className="text-body mb-8">
-                The complete arsenal. Includes LUTs Pack, BenizGrade, ColorFlow™, Lightroom Presets, Title Templates, and SFX Library. Everything you need to finish a film.
+                O arsenal completo. Inclui LUTs Pack, BenizGrade, ColorFlow™, Lightroom Presets, Title Templates e SFX Library. Tudo que você precisa para finalizar um filme.
               </p>
               <button 
                 className="w-full sm:w-auto bg-white text-black font-bold py-4 px-12 rounded-full hover:bg-neutral-200 transition-colors"
                 data-testid="button-get-bundle"
               >
-                Get the Bundle
+                Adquirir o Pacote
               </button>
             </div>
           </div>
@@ -315,7 +315,7 @@ export default function App() {
             <div className="text-eyebrow mb-4 text-accent">MOBILE</div>
             <h2 className="text-section mb-6">COLORLAB</h2>
             <p className="text-body mx-auto">
-              Professional color science in your pocket. Cinematic presets, adjustable intensity, and direct exports.
+              Ciência de cor profissional no seu bolso. Presets cinematográficos, intensidade ajustável e exportação direta para o rolo.
             </p>
           </div>
           
@@ -328,7 +328,7 @@ export default function App() {
                   <div className="w-8 h-8 rounded-full border-2 border-white/50"></div>
                 </div>
                 <h3 className="font-bold text-xl mb-2">ColorLab</h3>
-                <p className="text-sm text-muted text-center mb-8">Select a preset to begin</p>
+                <p className="text-sm text-muted text-center mb-8">Selecione um preset para começar</p>
                 <div className="w-full space-y-3">
                   {[1, 2, 3].map(i => (
                     <div key={i} className="w-full h-12 bg-white/5 rounded-lg border border-white/5"></div>
@@ -340,10 +340,10 @@ export default function App() {
           
           <div className="flex flex-col sm:flex-row justify-center gap-6">
             <button className="pill-bg px-8 py-4 rounded-full font-bold border border-white/10 hover:bg-white/10 transition-colors" data-testid="button-app-monthly">
-              $9.90 / month
+              R$49,90 / mês
             </button>
             <button className="bg-white text-black px-8 py-4 rounded-full font-bold hover:bg-neutral-200 transition-colors" data-testid="button-app-yearly">
-              $59.90 / year
+              R$299,90 / ano
             </button>
           </div>
         </Reveal>
@@ -375,7 +375,7 @@ export default function App() {
             LET'S<br/>CREATE.
           </h2>
           <div className="flex flex-col md:flex-row justify-between items-center border-t border-white/10 pt-8 text-sm font-bold text-muted gap-4">
-            <div>© {new Date().getFullYear()} Diego Fontes. All rights reserved.</div>
+            <div>© {new Date().getFullYear()} Diego Fontes. Todos os direitos reservados.</div>
             <a href="https://instagram.com/diegofmurta" target="_blank" rel="noreferrer" className="hover:text-white transition-colors" data-testid="link-social">
               @diegofmurta
             </a>
