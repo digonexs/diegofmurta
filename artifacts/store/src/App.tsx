@@ -1,5 +1,5 @@
-import React, { useEffect, useRef } from "react";
-import { motion, useInView } from "framer-motion";
+import React, { useEffect, useRef, useState } from "react";
+import { motion, useInView, AnimatePresence } from "framer-motion";
 
 const products = [
   {
@@ -59,6 +59,122 @@ const Reveal = ({ children, delay = 0 }: { children: React.ReactNode; delay?: nu
     >
       {children}
     </motion.div>
+  );
+};
+
+const beforeGradient =
+  "linear-gradient(160deg, #2a2a2a 0%, #1a1a1a 40%, #0f0f0f 100%)";
+const afterGradient =
+  "linear-gradient(160deg, #0d2622 0%, #0a1a2e 35%, #1a0a0a 65%, #2b1500 100%)";
+
+const BeforeAfter = () => {
+  const [active, setActive] = useState<"before" | "after">("before");
+
+  return (
+    <div className="flex flex-col items-center gap-6 w-full mb-20" data-testid="section-before-after">
+      {/* Toggle */}
+      <div
+        className="relative flex items-center rounded-full border border-white/10 p-1 gap-0"
+        style={{ background: "rgba(255,255,255,0.04)", backdropFilter: "blur(6px)" }}
+        data-testid="toggle-before-after"
+      >
+        {(["before", "after"] as const).map((val) => {
+          const isActive = active === val;
+          return (
+            <button
+              key={val}
+              onClick={() => setActive(val)}
+              data-testid={`button-toggle-${val}`}
+              className="relative z-10 px-8 py-2 rounded-full text-eyebrow transition-colors duration-300"
+              style={{ color: isActive ? "#000" : "oklch(0.72 0.004 80)" }}
+            >
+              {isActive && (
+                <motion.span
+                  layoutId="toggle-pill"
+                  className="absolute inset-0 rounded-full bg-white z-[-1]"
+                  transition={{ type: "spring", stiffness: 400, damping: 35 }}
+                />
+              )}
+              {val === "before" ? "ANTES" : "DEPOIS"}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Container */}
+      <div
+        className="relative w-full max-w-3xl mx-auto overflow-hidden rounded-sm"
+        style={{ aspectRatio: "16/9" }}
+        data-testid="container-before-after"
+      >
+        {/* Label */}
+        <div className="absolute top-4 left-4 z-20 text-eyebrow text-white/60 select-none">
+          {active === "before" ? "ANTES" : "DEPOIS"}
+        </div>
+
+        <AnimatePresence mode="wait">
+          {active === "before" ? (
+            <motion.div
+              key="before"
+              className="absolute inset-0"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.55, ease: [0.2, 0.7, 0.2, 1] }}
+              data-testid="visual-before"
+            >
+              <div className="w-full h-full" style={{ background: beforeGradient }} />
+              {/* Flat, desaturated film grain overlay */}
+              <div className="absolute inset-0 opacity-[0.07]"
+                style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E\")", backgroundSize: "300px 300px" }}
+              />
+              {/* Waveform / exposure grid lines */}
+              <div className="absolute inset-0 flex flex-col justify-center items-center gap-3 px-12 opacity-10">
+                {[...Array(6)].map((_, i) => (
+                  <div key={i} className="w-full h-px bg-white" style={{ opacity: 0.4 + i * 0.08 }} />
+                ))}
+              </div>
+              {/* "RAW" badge */}
+              <div className="absolute bottom-4 right-4 text-eyebrow text-white/30">RAW / LOG-C3</div>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="after"
+              className="absolute inset-0"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.55, ease: [0.2, 0.7, 0.2, 1] }}
+              data-testid="visual-after"
+            >
+              <div className="w-full h-full" style={{ background: afterGradient }} />
+              {/* Cinematic teal-orange split light */}
+              <div className="absolute inset-0"
+                style={{ background: "radial-gradient(ellipse 60% 80% at 25% 60%, rgba(0,180,140,0.18) 0%, transparent 70%)" }}
+              />
+              <div className="absolute inset-0"
+                style={{ background: "radial-gradient(ellipse 50% 70% at 78% 40%, rgba(200,100,20,0.22) 0%, transparent 65%)" }}
+              />
+              {/* Vignette */}
+              <div className="absolute inset-0"
+                style={{ background: "radial-gradient(ellipse 100% 100% at 50% 50%, transparent 40%, rgba(0,0,0,0.72) 100%)" }}
+              />
+              {/* Film grain */}
+              <div className="absolute inset-0 opacity-[0.09] mix-blend-overlay"
+                style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E\")", backgroundSize: "300px 300px" }}
+              />
+              {/* "GRADED" badge */}
+              <div className="absolute bottom-4 right-4 text-eyebrow" style={{ color: "oklch(0.72 0.16 145)" }}>
+                BENIZGRADE
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Border frame */}
+        <div className="absolute inset-0 border border-white/10 pointer-events-none rounded-sm" />
+      </div>
+    </div>
   );
 };
 
@@ -124,6 +240,7 @@ export default function App() {
       {/* Products Section */}
       <section id="products" className="px-[var(--spacing-pad)] py-32 bg-black relative z-10">
         <Reveal>
+          <BeforeAfter />
           <div className="text-eyebrow mb-4 text-accent">THE COLLECTION</div>
           <h2 className="text-section mb-16">DIGITAL TOOLS</h2>
         </Reveal>
