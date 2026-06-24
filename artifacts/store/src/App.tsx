@@ -74,8 +74,7 @@ const BeforeAfter = () => {
     <div className="flex flex-col items-center gap-6 w-full mb-20" data-testid="section-before-after">
       {/* Toggle */}
       <div
-        className="relative flex items-center rounded-full border border-white/10 p-1 gap-0"
-        style={{ background: "rgba(255,255,255,0.04)", backdropFilter: "blur(6px)" }}
+        className="liquid-glass relative flex items-center rounded-full p-1 gap-0"
         data-testid="toggle-before-after"
       >
         {(["before", "after"] as const).map((val) => {
@@ -276,7 +275,7 @@ export default function App() {
                   <div className="flex items-center justify-between mt-4">
                     <span className="text-lg font-bold">{product.price}</span>
                     <button 
-                      className="pill-bg px-6 py-2 rounded-full text-sm font-bold tracking-tight opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300 hover:bg-white hover:text-black"
+                      className="liquid-glass px-6 py-2 rounded-full text-sm font-bold tracking-tight opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300"
                       data-testid={`button-get-${product.id}`}
                     >
                       Adquirir →
@@ -304,13 +303,13 @@ export default function App() {
               <div className="flex items-center gap-4 mb-8">
                 <span className="text-4xl font-bold">R$449,90</span>
                 <span className="text-muted line-through">R$1.129,90</span>
-                <span className="pill-bg px-3 py-1 text-xs font-bold text-accent rounded-full border border-white/10">60% OFF</span>
+                <span className="liquid-glass px-3 py-1 text-xs font-bold text-accent rounded-full">60% OFF</span>
               </div>
               <p className="text-body mb-8">
                 O arsenal completo. Inclui LUTs Pack, BenizGrade, ColorFlow™, Lightroom Presets, Title Templates e SFX Library. Tudo que você precisa para finalizar um filme.
               </p>
               <button 
-                className="w-full sm:w-auto bg-white text-black font-bold py-4 px-12 rounded-full hover:bg-neutral-200 transition-colors"
+                className="w-full sm:w-auto liquid-glass-primary font-bold py-4 px-12 rounded-full"
                 data-testid="button-get-bundle"
               >
                 Adquirir o Pacote
@@ -351,10 +350,10 @@ export default function App() {
           </div>
           
           <div className="flex flex-col sm:flex-row justify-center gap-6">
-            <button className="pill-bg px-8 py-4 rounded-full font-bold border border-white/10 hover:bg-white/10 transition-colors" data-testid="button-app-monthly">
+            <button className="liquid-glass px-8 py-4 rounded-full font-bold" data-testid="button-app-monthly">
               R$49,90 / mês
             </button>
-            <button className="bg-white text-black px-8 py-4 rounded-full font-bold hover:bg-neutral-200 transition-colors" data-testid="button-app-yearly">
+            <button className="liquid-glass-primary px-8 py-4 rounded-full font-bold" data-testid="button-app-yearly">
               R$299,90 / ano
             </button>
           </div>
