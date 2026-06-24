@@ -230,18 +230,23 @@ export default function App() {
 
       {/* Marquee */}
       <div className="w-full border-y border-white/10 py-4 overflow-hidden bg-black relative z-10">
-        <div className="marquee-track">
+        <motion.div
+          className="flex w-max"
+          animate={{ x: "-50%" }}
+          initial={{ x: "0%" }}
+          transition={{ duration: 28, ease: "linear", repeat: Infinity, repeatType: "loop" }}
+        >
           {[0, 1].map((copy) => (
-            <div key={copy} className="marquee-group" aria-hidden={copy === 1}>
+            <div key={copy} className="flex shrink-0 items-center" aria-hidden={copy === 1}>
               {["LUTS", "PRESETS", "POWERGRADE", "COLORFLOW™", "SFX", "COLORLAB", "TÍTULOS"].map((item) => (
                 <span key={item} className="text-eyebrow flex items-center">
-                  <span className="px-8">{item}</span>
-                  <span className="text-white/20">—</span>
+                  <span className="px-8 py-1 whitespace-nowrap">{item}</span>
+                  <span className="text-white/20 select-none">—</span>
                 </span>
               ))}
             </div>
           ))}
-        </div>
+        </motion.div>
       </div>
 
       {/* Products Section */}
