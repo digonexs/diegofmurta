@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { motion, useInView, AnimatePresence } from "framer-motion";
+import { motion, useInView, AnimatePresence, useMotionValue, useAnimationFrame } from "framer-motion";
 
 const products = [
   {
@@ -59,6 +59,60 @@ const Reveal = ({ children, delay = 0 }: { children: React.ReactNode; delay?: nu
     >
       {children}
     </motion.div>
+  );
+};
+
+const MARQUEE_ITEMS = ["LUTS", "PRESETS", "POWERGRADE", "COLORFLOW™", "SFX", "COLORLAB", "TÍTULOS"];
+const MARQUEE_SPEED = 80; // px per second
+
+const MarqueeStrip = () => {
+  const groupRef = useRef<HTMLDivElement>(null);
+  const x = useMotionValue(0);
+  const [copies, setCopies] = useState(6);
+
+  useEffect(() => {
+    const measure = () => {
+      if (groupRef.current) {
+        const gw = groupRef.current.offsetWidth;
+        if (gw > 0) {
+          setCopies(Math.ceil(window.innerWidth / gw) + 3);
+        }
+      }
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, []);
+
+  useAnimationFrame((_, delta) => {
+    if (!groupRef.current) return;
+    const gw = groupRef.current.offsetWidth;
+    if (gw === 0) return;
+    let next = x.get() - (delta / 1000) * MARQUEE_SPEED;
+    if (next <= -gw) next += gw;
+    x.set(next);
+  });
+
+  return (
+    <div className="w-full border-y border-white/10 py-4 overflow-hidden bg-black relative z-10">
+      <motion.div className="flex w-max" style={{ x }}>
+        {Array.from({ length: copies }).map((_, i) => (
+          <div
+            key={i}
+            ref={i === 0 ? groupRef : undefined}
+            className="flex shrink-0 items-center"
+            aria-hidden={i > 0}
+          >
+            {MARQUEE_ITEMS.map((item) => (
+              <span key={item} className="text-eyebrow flex items-center">
+                <span className="px-8 py-1 whitespace-nowrap">{item}</span>
+                <span className="text-white/20 select-none">—</span>
+              </span>
+            ))}
+          </div>
+        ))}
+      </motion.div>
+    </div>
   );
 };
 
@@ -228,25 +282,7 @@ export default function App() {
       </section>
 
       {/* Marquee */}
-      <div className="w-full border-y border-white/10 py-4 overflow-hidden bg-black relative z-10">
-        <motion.div
-          className="flex w-max"
-          animate={{ x: "-50%" }}
-          initial={{ x: "0%" }}
-          transition={{ duration: 28, ease: "linear", repeat: Infinity, repeatType: "loop" }}
-        >
-          {[0, 1].map((copy) => (
-            <div key={copy} className="flex shrink-0 items-center" aria-hidden={copy === 1}>
-              {["LUTS", "PRESETS", "POWERGRADE", "COLORFLOW™", "SFX", "COLORLAB", "TÍTULOS"].map((item) => (
-                <span key={item} className="text-eyebrow flex items-center">
-                  <span className="px-8 py-1 whitespace-nowrap">{item}</span>
-                  <span className="text-white/20 select-none">—</span>
-                </span>
-              ))}
-            </div>
-          ))}
-        </motion.div>
-      </div>
+      <MarqueeStrip />
 
       {/* Products Section */}
       <section id="products" className="px-[var(--spacing-pad)] py-32 bg-black relative z-10">
