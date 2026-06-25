@@ -1,0 +1,6 @@
+{
+  "buildCommand": "pnpm --filter @workspace/store run build",
+  "outputDirectory": "artifacts/store/dist/public",
+  "installCommand": "pnpm install --frozen-lockfile",
+  "framework": null
+}
