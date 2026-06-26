@@ -242,14 +242,14 @@ const Nav = () => {
 
   return (
     <>
-      <nav className="fixed top-0 w-full z-40 px-[var(--spacing-pad)] py-6 flex items-center">
+      <nav className="fixed top-0 w-full z-40 px-[var(--spacing-pad)] py-6 flex items-center mix-blend-difference">
         {/* Dot logo */}
         <div className="text-brand flex items-center gap-2 cursor-pointer" data-testid="link-home">
           <span className="w-1.5 h-1.5 rounded-full bg-accent mt-1" />
         </div>
 
         {/* Desktop links */}
-        <div className="hidden md:flex gap-8 text-eyebrow absolute left-1/2 -translate-x-1/2 mix-blend-difference">
+        <div className="hidden md:flex gap-8 text-eyebrow absolute left-1/2 -translate-x-1/2">
           {NAV_LINKS.map(({ href, label, testId }) => (
             <a key={href} href={href} className="hover:text-muted transition-colors duration-300" data-testid={testId}>
               {label}
