@@ -231,6 +231,87 @@ const BeforeAfter = () => {
   );
 };
 
+const NAV_LINKS = [
+  { href: "#products", label: "PRODUTOS", testId: "link-nav-products" },
+  { href: "#bundles", label: "PACOTES", testId: "link-nav-bundles" },
+  { href: "#colorlab", label: "COLORLAB", testId: "link-nav-colorlab" },
+];
+
+const Nav = () => {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <>
+      <nav className="fixed top-0 w-full z-40 px-[var(--spacing-pad)] py-6 flex items-center">
+        {/* Dot logo */}
+        <div className="text-brand flex items-center gap-2 cursor-pointer" data-testid="link-home">
+          <span className="w-1.5 h-1.5 rounded-full bg-accent mt-1" />
+        </div>
+
+        {/* Desktop links */}
+        <div className="hidden md:flex gap-8 text-eyebrow absolute left-1/2 -translate-x-1/2 mix-blend-difference">
+          {NAV_LINKS.map(({ href, label, testId }) => (
+            <a key={href} href={href} className="hover:text-muted transition-colors duration-300" data-testid={testId}>
+              {label}
+            </a>
+          ))}
+        </div>
+
+        {/* Hamburger — mobile only */}
+        <button
+          className="md:hidden ml-auto flex flex-col gap-[5px] p-2 z-50"
+          onClick={() => setOpen((v) => !v)}
+          aria-label="Menu"
+        >
+          <motion.span
+            className="block w-6 h-px bg-white origin-center"
+            animate={open ? { rotate: 45, y: 6 } : { rotate: 0, y: 0 }}
+            transition={{ duration: 0.25 }}
+          />
+          <motion.span
+            className="block w-6 h-px bg-white"
+            animate={open ? { opacity: 0 } : { opacity: 1 }}
+            transition={{ duration: 0.15 }}
+          />
+          <motion.span
+            className="block w-6 h-px bg-white origin-center"
+            animate={open ? { rotate: -45, y: -6 } : { rotate: 0, y: 0 }}
+            transition={{ duration: 0.25 }}
+          />
+        </button>
+      </nav>
+
+      {/* Mobile menu overlay */}
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            className="fixed inset-0 z-30 bg-black flex flex-col items-center justify-center gap-10 md:hidden"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            {NAV_LINKS.map(({ href, label, testId }, i) => (
+              <motion.a
+                key={href}
+                href={href}
+                data-testid={testId}
+                className="text-section text-white"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.08, duration: 0.35 }}
+                onClick={() => setOpen(false)}
+              >
+                {label}
+              </motion.a>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
+  );
+};
+
 export default function App() {
   useEffect(() => {
     document.documentElement.classList.add("dark");
@@ -249,16 +330,7 @@ export default function App() {
       </div>
 
       {/* Nav */}
-      <nav className="fixed top-0 w-full z-40 px-[var(--spacing-pad)] py-6 flex items-center mix-blend-difference">
-        <div className="text-brand flex items-center gap-2 cursor-pointer" data-testid="link-home">
-          <span className="w-1.5 h-1.5 rounded-full bg-accent mt-1" />
-        </div>
-        <div className="hidden md:flex gap-8 text-eyebrow absolute left-1/2 -translate-x-1/2">
-          <a href="#products" className="hover:text-muted transition-colors duration-300" data-testid="link-nav-products">PRODUTOS</a>
-          <a href="#bundles" className="hover:text-muted transition-colors duration-300" data-testid="link-nav-bundles">PACOTES</a>
-          <a href="#colorlab" className="hover:text-muted transition-colors duration-300" data-testid="link-nav-colorlab">COLORLAB</a>
-        </div>
-      </nav>
+      <Nav />
 
       {/* Hero */}
       <section className="relative w-full h-[100svh] flex flex-col justify-end px-[var(--spacing-pad)] pb-24">
