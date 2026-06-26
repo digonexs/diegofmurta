@@ -156,7 +156,7 @@ const BeforeAfter = () => {
 
       {/* Container */}
       <div
-        className="relative w-full max-w-3xl mx-auto overflow-hidden rounded-sm"
+        className="relative w-full max-w-6xl mx-auto overflow-hidden rounded-sm"
         style={{ aspectRatio: "16/9" }}
         data-testid="container-before-after"
       >
@@ -249,12 +249,11 @@ export default function App() {
       </div>
 
       {/* Nav */}
-      <nav className="fixed top-0 w-full z-40 px-[var(--spacing-pad)] py-6 flex justify-between items-center mix-blend-difference">
+      <nav className="fixed top-0 w-full z-40 px-[var(--spacing-pad)] py-6 flex items-center mix-blend-difference">
         <div className="text-brand flex items-center gap-2 cursor-pointer" data-testid="link-home">
-          DIEGO FONTES
           <span className="w-1.5 h-1.5 rounded-full bg-accent mt-1" />
         </div>
-        <div className="hidden md:flex gap-8 text-eyebrow">
+        <div className="hidden md:flex gap-8 text-eyebrow absolute left-1/2 -translate-x-1/2">
           <a href="#products" className="hover:text-muted transition-colors duration-300" data-testid="link-nav-products">PRODUTOS</a>
           <a href="#bundles" className="hover:text-muted transition-colors duration-300" data-testid="link-nav-bundles">PACOTES</a>
           <a href="#colorlab" className="hover:text-muted transition-colors duration-300" data-testid="link-nav-colorlab">COLORLAB</a>
@@ -263,8 +262,15 @@ export default function App() {
 
       {/* Hero */}
       <section className="relative w-full h-[100svh] flex flex-col justify-end px-[var(--spacing-pad)] pb-24">
-        <div className="absolute inset-0 z-0">
-          <div className="w-full h-full bg-neutral-900" style={{ backgroundImage: "linear-gradient(to bottom, #111, #000)" }}></div>
+        <div className="absolute inset-0 z-0 overflow-hidden">
+          <video
+            src="/hero-background.mp4"
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover"
+          />
           <div className="absolute inset-0 hero-overlay" />
         </div>
         
@@ -272,7 +278,7 @@ export default function App() {
           <Reveal>
             <div className="text-eyebrow mb-6 text-accent">O ATELIÊ DIGITAL</div>
             <h1 className="text-hero mb-8">
-              COLOR.<br />GRADE.<br />CREATE.
+              DIEGO<br />FONTES<br />MURTA
             </h1>
             <p className="text-body max-w-[42ch]">
               Uma coleção curada de ferramentas premium de um diretor em atividade. Feita para criadores cinematográficos que exigem ciência exata, não achismos.
