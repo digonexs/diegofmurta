@@ -1,46 +1,118 @@
 import React, { useEffect, useRef, useState } from "react";
+import Hls from "hls.js";
+import { useTranslation } from "react-i18next";
+
+const HLS_SRC = "https://stream.mux.com/tLkHO1qZoaaQOUeVWo8hEBeGQfySP02EPS02BmnNFyXys.m3u8";
+
+function HlsVideo({ className, style }: { className?: string; style?: React.CSSProperties }) {
+  const ref = useRef<HTMLVideoElement>(null);
+  useEffect(() => {
+    const video = ref.current;
+    if (!video) return undefined;
+    if (video.canPlayType("application/vnd.apple.mpegurl")) {
+      video.src = HLS_SRC;
+      return undefined;
+    }
+    if (Hls.isSupported()) {
+      const hls = new Hls({ autoStartLoad: true });
+      hls.loadSource(HLS_SRC);
+      hls.attachMedia(video);
+      return () => hls.destroy();
+    }
+    return undefined;
+  }, []);
+  return <video ref={ref} autoPlay muted loop playsInline className={className} style={style} />;
+}
 import { motion, useInView, AnimatePresence, useMotionValue, useAnimationFrame } from "framer-motion";
+import { AboutSection } from "./AboutSection";
+import { FooterSection } from "./FooterSection";
+
+const Typewriter = () => {
+  const { t, i18n } = useTranslation();
+  const text = t("hero_typewriter");
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, amount: 0.5 });
+  const [displayed, setDisplayed] = useState("");
+
+  useEffect(() => {
+    if (!isInView) return;
+    let i = 0;
+    let forward = true;
+    let timeout: ReturnType<typeof setTimeout>;
+
+    const tick = () => {
+      if (forward) {
+        i++;
+        setDisplayed(text.slice(0, i));
+        if (i >= text.length) {
+          forward = false;
+          timeout = setTimeout(tick, 1800);
+          return;
+        }
+      } else {
+        i--;
+        setDisplayed(text.slice(0, i));
+        if (i <= 0) {
+          forward = true;
+          timeout = setTimeout(tick, 500);
+          return;
+        }
+      }
+      timeout = setTimeout(tick, forward ? 45 : 22);
+    };
+
+    timeout = setTimeout(tick, 400);
+    return () => clearTimeout(timeout);
+  }, [isInView, i18n.language, text]);
+
+  return (
+    <p ref={ref} className="text-body max-w-[42ch] !text-[clamp(15px,1.2vw,19px)]" style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}>
+      {displayed}
+      <span className="inline-block w-px h-[1em] bg-current align-middle ml-0.5 animate-pulse" />
+    </p>
+  );
+};
 
 const products = [
   {
     id: 1,
     name: "LUTs Pack",
-    category: "Correção de Cor",
+    category: "Color Grading",
     price: "R$149,90",
     gradient: "linear-gradient(135deg, #111827 0%, #064e3b 100%)",
   },
   {
     id: 2,
     name: "BenizGrade",
-    category: "Correção de Cor",
+    category: "Color Grading",
     price: "R$299,90",
     gradient: "linear-gradient(135deg, #450a0a 0%, #1e1b4b 100%)",
   },
   {
     id: 3,
     name: "ColorFlow™",
-    category: "Correção de Cor",
+    category: "Color Grading",
     price: "R$249,90",
     gradient: "linear-gradient(135deg, #022c22 0%, #000000 100%)",
   },
   {
     id: 4,
     name: "Lightroom Presets Pack",
-    category: "Edição de Foto",
+    category: "Photo Editing",
     price: "R$124,90",
     gradient: "linear-gradient(135deg, #1c1917 0%, #1e3a8a 100%)",
   },
   {
     id: 5,
     name: "Cinematic Title Templates",
-    category: "Motion & Títulos",
+    category: "Motion & Titles",
     price: "R$64,90",
     gradient: "linear-gradient(135deg, #27272a 0%, #171717 100%)",
   },
   {
     id: 6,
     name: "SFX Library",
-    category: "Motion & Títulos",
+    category: "Motion & Titles",
     price: "R$99,90",
     gradient: "linear-gradient(135deg, #09090b 0%, #262626 100%)",
   },
@@ -62,7 +134,7 @@ const Reveal = ({ children, delay = 0 }: { children: React.ReactNode; delay?: nu
   );
 };
 
-const MARQUEE_ITEMS = ["LUTS", "PRESETS", "POWERGRADE", "COLORFLOW™", "SFX", "COLORLAB", "TÍTULOS"];
+const MARQUEE_ITEMS = ["LUTS", "PRESETS", "POWERGRADE", "COLORFLOW™", "SFX", "COLORLAB", "TITLES"];
 const MARQUEE_SPEED = 80; // px per second
 
 const MarqueeStrip = () => {
@@ -116,6 +188,34 @@ const MarqueeStrip = () => {
   );
 };
 
+// ─── Products Grid ────────────────────────────────────────────
+const PRODUCTS_LIST = [
+  {
+    id: 1,
+    name: "Cinematic LUTs Pack",
+    categoryKey: "cat_color_grading",
+    priceKey: "price_luts",
+    gradient: "linear-gradient(145deg, #0f172a 0%, #064e3b 100%)",
+    glow: "rgba(52,211,153,0.18)",
+  },
+  {
+    id: 2,
+    name: "Lifestyle Presets Lightroom",
+    categoryKey: "cat_photo_editing",
+    priceKey: "price_presets",
+    gradient: "linear-gradient(145deg, #1e1b4b 0%, #450a0a 100%)",
+    glow: "rgba(167,139,250,0.18)",
+  },
+  {
+    id: 3,
+    name: "SFXs Combo",
+    categoryKey: "cat_audio_motion",
+    priceKey: "price_sfx",
+    gradient: "linear-gradient(145deg, #18181b 0%, #292524 100%)",
+    glow: "rgba(251,146,60,0.18)",
+  },
+];
+
 const beforeGradient =
   "linear-gradient(160deg, #2a2a2a 0%, #1a1a1a 40%, #0f0f0f 100%)";
 const afterGradient =
@@ -123,6 +223,7 @@ const afterGradient =
 
 const BeforeAfter = () => {
   const [active, setActive] = useState<"before" | "after">("before");
+  const { t } = useTranslation();
 
   return (
     <div className="flex flex-col items-center gap-6 w-full mb-20" data-testid="section-before-after">
@@ -148,7 +249,7 @@ const BeforeAfter = () => {
                   transition={{ type: "spring", stiffness: 400, damping: 35 }}
                 />
               )}
-              {val === "before" ? "ANTES" : "DEPOIS"}
+              {val === "before" ? t("before") : t("after")}
             </button>
           );
         })}
@@ -162,7 +263,7 @@ const BeforeAfter = () => {
       >
         {/* Label */}
         <div className="absolute top-4 left-4 z-20 text-eyebrow text-white/60 select-none">
-          {active === "before" ? "ANTES" : "DEPOIS"}
+          {active === "before" ? t("before_label") : t("after_label")}
         </div>
 
         <AnimatePresence mode="wait">
@@ -231,28 +332,37 @@ const BeforeAfter = () => {
   );
 };
 
-const NAV_LINKS = [
-  { href: "#products", label: "PRODUTOS", testId: "link-nav-products" },
-  { href: "#bundles", label: "PACOTES", testId: "link-nav-bundles" },
-  { href: "#colorlab", label: "COLORLAB", testId: "link-nav-colorlab" },
+const NAV_LINK_DEFS = [
+  { href: "#about",    labelKey: "nav_about",    testId: "link-nav-about" },
+  { href: "#products", labelKey: "nav_products", testId: "link-nav-products" },
+  { href: "#bundles",  labelKey: "nav_bundles",  testId: "link-nav-bundles" },
+];
+
+const LANGUAGES = [
+  { code: "en", flag: "🇺🇸" },
+  { code: "pt", flag: "🇧🇷" },
+  { code: "es", flag: "🇪🇸" },
 ];
 
 const Nav = () => {
   const [open, setOpen] = useState(false);
+  const { t, i18n } = useTranslation();
 
   return (
     <>
-      <nav className="fixed top-0 w-full z-40 px-[var(--spacing-pad)] py-6 flex items-center mix-blend-difference">
-        {/* Dot logo */}
-        <div className="text-brand flex items-center gap-2 cursor-pointer" data-testid="link-home">
-          <span className="w-1.5 h-1.5 rounded-full bg-accent mt-1" />
-        </div>
+      <nav className="fixed top-0 w-full z-40 px-[var(--spacing-pad)] py-6 flex items-center">
+        <a href="#" className="text-brand flex items-center gap-2" data-testid="link-home">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="w-8 h-8">
+            <path d="M15 12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h1.172a3 3 0 0 0 2.12-.879l.83-.828A1 1 0 0 1 6.827 3h2.344a1 1 0 0 1 .707.293l.828.828A3 3 0 0 0 12.828 5H14a1 1 0 0 1 1 1zM2 4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-1.172a2 2 0 0 1-1.414-.586l-.828-.828A2 2 0 0 0 9.172 2H6.828a2 2 0 0 0-1.414.586l-.828.828A2 2 0 0 1 3.172 4z"/>
+            <path d="M8 11a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5m0 1a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7M3 6.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0"/>
+          </svg>
+        </a>
 
         {/* Desktop links */}
         <div className="hidden md:flex gap-8 text-eyebrow absolute left-1/2 -translate-x-1/2">
-          {NAV_LINKS.map(({ href, label, testId }) => (
+          {NAV_LINK_DEFS.map(({ href, labelKey, testId }) => (
             <a key={href} href={href} className="hover:text-muted transition-colors duration-300" data-testid={testId}>
-              {label}
+              {t(labelKey)}
             </a>
           ))}
         </div>
@@ -263,48 +373,66 @@ const Nav = () => {
           onClick={() => setOpen((v) => !v)}
           aria-label="Menu"
         >
-          <motion.span
-            className="block w-6 h-px bg-white origin-center"
-            animate={open ? { rotate: 45, y: 6 } : { rotate: 0, y: 0 }}
-            transition={{ duration: 0.25 }}
-          />
-          <motion.span
-            className="block w-6 h-px bg-white"
-            animate={open ? { opacity: 0 } : { opacity: 1 }}
-            transition={{ duration: 0.15 }}
-          />
-          <motion.span
-            className="block w-6 h-px bg-white origin-center"
-            animate={open ? { rotate: -45, y: -6 } : { rotate: 0, y: 0 }}
-            transition={{ duration: 0.25 }}
-          />
+          <motion.span className="block w-6 h-px bg-white origin-center" animate={open ? { rotate: 45, y: 6 } : { rotate: 0, y: 0 }} transition={{ duration: 0.25 }} />
+          <motion.span className="block w-6 h-px bg-white" animate={open ? { opacity: 0 } : { opacity: 1 }} transition={{ duration: 0.15 }} />
+          <motion.span className="block w-6 h-px bg-white origin-center" animate={open ? { rotate: -45, y: -6 } : { rotate: 0, y: 0 }} transition={{ duration: 0.25 }} />
         </button>
       </nav>
+
+      {/* Language selector — outside mix-blend scope so emojis render correctly */}
+      <div className="fixed top-0 right-[var(--spacing-pad)] z-50 py-4 hidden md:flex items-center">
+        <select
+          value={i18n.language}
+          onChange={(e) => i18n.changeLanguage(e.target.value)}
+          className="bg-transparent outline-none text-xl cursor-pointer rounded-full px-3 py-1"
+          style={{
+            color: "white",
+            WebkitAppearance: "none",
+            appearance: "none",
+            border: "1px solid rgba(255,255,255,0.3)",
+          }}
+        >
+          {LANGUAGES.map(({ code, flag }) => (
+            <option key={code} value={code} style={{ background: "#000", fontSize: "1rem" }}>
+              {flag}
+            </option>
+          ))}
+        </select>
+      </div>
 
       {/* Mobile menu overlay */}
       <AnimatePresence>
         {open && (
           <motion.div
             className="fixed inset-0 z-30 bg-black flex flex-col items-center justify-center gap-10 md:hidden"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}
           >
-            {NAV_LINKS.map(({ href, label, testId }, i) => (
+            {NAV_LINK_DEFS.map(({ href, labelKey, testId }, i) => (
               <motion.a
-                key={href}
-                href={href}
-                data-testid={testId}
+                key={href} href={href} data-testid={testId}
                 className="text-section text-white"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.08, duration: 0.35 }}
                 onClick={() => setOpen(false)}
               >
-                {label}
+                {t(labelKey)}
               </motion.a>
             ))}
+            {/* Language selector for mobile */}
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}>
+              <select
+                value={i18n.language}
+                onChange={(e) => { i18n.changeLanguage(e.target.value); setOpen(false); }}
+                className="bg-transparent border-none outline-none text-3xl cursor-pointer"
+                style={{ color: "white", WebkitAppearance: "none", appearance: "none" }}
+              >
+                {LANGUAGES.map(({ code, flag }) => (
+                  <option key={code} value={code} style={{ background: "#000", fontSize: "1rem" }}>
+                    {flag}
+                  </option>
+                ))}
+              </select>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -313,12 +441,13 @@ const Nav = () => {
 };
 
 export default function App() {
+  const { t } = useTranslation();
   useEffect(() => {
     document.documentElement.classList.add("dark");
   }, []);
 
   return (
-    <div className="min-h-screen bg-black text-white w-full overflow-x-hidden">
+    <div className="min-h-screen bg-black text-white w-full">
       {/* Noise Texture */}
       <div className="fixed inset-0 pointer-events-none mix-blend-overlay opacity-50 z-50">
         <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" preserveAspectRatio="none">
@@ -329,11 +458,8 @@ export default function App() {
         </svg>
       </div>
 
-      {/* Nav */}
-      <Nav />
-
       {/* Hero */}
-      <section className="relative w-full h-[100svh] flex flex-col justify-end px-[var(--spacing-pad)] pb-24">
+      <section style={{ position: "relative", width: "100%", height: "100dvh", display: "flex", flexDirection: "column", justifyContent: "center", padding: "0 var(--spacing-pad)", margin: 0, top: 0 }}>
         <div className="absolute inset-0 z-0 overflow-hidden">
           <video
             src="/hero-background.mp4"
@@ -342,57 +468,69 @@ export default function App() {
             muted
             playsInline
             className="absolute inset-0 w-full h-full object-cover"
+            style={{ willChange: "transform" }}
           />
           <div className="absolute inset-0 hero-overlay" />
         </div>
-        
+
         <div className="relative z-10 max-w-7xl">
           <Reveal>
-            <div className="text-eyebrow mb-6 text-accent">O ATELIÊ DIGITAL</div>
+            <div className="text-eyebrow mb-6 text-accent" style={{ textTransform: "none" }}>@diegofmurta</div>
             <h1 className="text-hero mb-8">
               DIEGO<br />FONTES<br />MURTA
             </h1>
-            <p className="text-body max-w-[42ch]">
-              Uma coleção curada de ferramentas premium de um diretor em atividade. Feita para criadores cinematográficos que exigem ciência exata, não achismos.
-            </p>
+            <Typewriter />
           </Reveal>
         </div>
       </section>
 
+      {/* Nav — rendered after hero in DOM so it doesn't push hero down */}
+      <Nav />
+
       {/* Marquee */}
       <MarqueeStrip />
 
+      {/* About Section */}
+      <AboutSection />
+
       {/* Products Section */}
-      <section id="products" className="px-[var(--spacing-pad)] py-32 bg-black relative z-10">
+      {/* Before / After — white background */}
+      <section id="before-after" className="px-[var(--spacing-pad)] py-32 bg-neutral-950 relative z-10 border-t border-white/10">
         <Reveal>
           <BeforeAfter />
-          <div className="text-eyebrow mb-4 text-accent">A COLEÇÃO</div>
-          <h2 className="text-section mb-16">FERRAMENTAS DIGITAIS</h2>
         </Reveal>
+      </section>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
-          {products.map((product, i) => (
-            <Reveal key={product.id} delay={i * 0.1}>
-              <div 
-                className="group relative w-full aspect-[3/4] md:aspect-[4/5] bg-neutral-900 overflow-hidden cursor-pointer"
-                data-testid={`card-product-${product.id}`}
+      {/* Products */}
+      <section id="products" className="px-[var(--spacing-pad)] py-32 bg-black relative z-10 border-t border-white/10 overflow-hidden">
+        <HlsVideo className="absolute inset-0 w-full h-full object-cover opacity-30 pointer-events-none" style={{ zIndex: 0 }} />
+        <div className="relative z-10">
+        <Reveal>
+          <h2 className="text-section mb-24">{t("products_title")}</h2>
+        </Reveal>
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-8 max-w-7xl mx-auto w-full">
+          {PRODUCTS_LIST.map((p, i) => (
+            <Reveal key={p.id} delay={i * 0.08}>
+              <div
+                className="group relative w-full aspect-square overflow-hidden rounded-2xl cursor-pointer"
+                style={{ background: p.gradient }}
               >
-                <div 
-                  className="absolute inset-0 transition-transform duration-[1.1s] ease-[cubic-bezier(.16,.84,.34,1)] group-hover:scale-[1.045] group-hover:brightness-[0.82]"
-                  style={{ background: product.gradient }}
-                />
-                <div className="absolute inset-0 card-scrim" />
-                
-                <div className="absolute inset-0 p-8 flex flex-col justify-end">
-                  <div className="text-eyebrow mb-2 opacity-80">{product.category}</div>
-                  <h3 className="text-card-title mb-2">{product.name}</h3>
-                  <div className="flex items-center justify-between mt-4">
-                    <span className="text-lg font-bold">{product.price}</span>
-                    <button 
-                      className="liquid-glass px-6 py-2 rounded-full text-sm font-bold tracking-tight opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300"
-                      data-testid={`button-get-${product.id}`}
-                    >
-                      Adquirir →
+                {/* Glow */}
+                <div className="absolute inset-0" style={{ background: `radial-gradient(ellipse 70% 60% at 30% 35%, ${p.glow}, transparent 70%)` }} />
+                {/* Noise */}
+                <div className="absolute inset-0 opacity-[0.06]" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E\")", backgroundSize: "200px" }} />
+                {/* Bottom scrim */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+
+                <div className="absolute inset-0 p-5 flex flex-col justify-end">
+                  <div className="text-eyebrow mb-1.5 text-white/50">{t(p.categoryKey)}</div>
+                  <h3 className="font-bold text-base lg:text-lg leading-tight mb-4">{p.name}</h3>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="text-lg font-bold">{t(p.priceKey)}</div>
+                    </div>
+                    <button className="liquid-glass px-4 py-1.5 rounded-full text-xs font-bold opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
+                      {t("see_more")}
                     </button>
                   </div>
                 </div>
@@ -400,113 +538,51 @@ export default function App() {
             </Reveal>
           ))}
         </div>
+        </div>
       </section>
 
       {/* Featured Bundle */}
       <section id="bundles" className="w-full bg-neutral-950 py-32 px-[var(--spacing-pad)] border-y border-white/10 relative z-10">
         <Reveal>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            <div className="aspect-square bg-black border border-white/10 relative overflow-hidden flex items-center justify-center p-12">
+          <div className="flex justify-center mb-10">
+            <span className="liquid-glass pulse-glow text-eyebrow px-4 py-1.5 rounded-full">{t("best_seller")}</span>
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center max-w-5xl mx-auto">
+            <div className="aspect-square max-w-sm mx-auto w-full bg-black border border-white/10 relative overflow-hidden flex items-center justify-center p-12">
               <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-accent/40 via-transparent to-transparent"></div>
-              <h2 className="text-hero text-center mix-blend-overlay opacity-30">ESSENTIALS</h2>
+              <h2 className="text-hero text-center mix-blend-overlay opacity-30">CREATOR</h2>
             </div>
-            
+
             <div>
-              <div className="text-eyebrow mb-6 text-accent">PACOTE</div>
-              <h2 className="text-section mb-6">CREATOR'S<br/>ESSENTIALS</h2>
+              <h2 className="text-section mb-6">CREATOR COMBO</h2>
+              <p className="text-body mb-8">{t("bundle_desc")}</p>
               <div className="flex items-center gap-4 mb-8">
-                <span className="text-4xl font-bold">R$449,90</span>
-                <span className="text-muted line-through">R$1.129,90</span>
-                <span className="liquid-glass px-3 py-1 text-xs font-bold text-accent rounded-full">60% OFF</span>
+                <span className="text-4xl font-bold">{t("price_bundle")}</span>
+                <span className="text-muted line-through">{t("price_bundle_original")}</span>
+                <span className="liquid-glass px-3 py-1 text-xs font-bold text-accent rounded-full">SAVE 31%</span>
               </div>
-              <p className="text-body mb-8">
-                O arsenal completo. Inclui LUTs Pack, BenizGrade, ColorFlow™, Lightroom Presets, Title Templates e SFX Library. Tudo que você precisa para finalizar um filme.
-              </p>
-              <button 
+              <button
                 className="w-full sm:w-auto liquid-glass-primary font-bold py-4 px-12 rounded-full"
                 data-testid="button-get-bundle"
               >
-                Adquirir o Pacote
+                {t("bundle_cta")}
               </button>
             </div>
           </div>
         </Reveal>
       </section>
 
-      {/* App Section */}
-      <section id="colorlab" className="py-32 px-[var(--spacing-pad)] relative z-10 bg-black">
-        <Reveal>
-          <div className="text-center max-w-3xl mx-auto mb-20">
-            <div className="text-eyebrow mb-4 text-accent">MOBILE</div>
-            <h2 className="text-section mb-6">COLORLAB</h2>
-            <p className="text-body mx-auto">
-              Ciência de cor profissional no seu bolso. Presets cinematográficos, intensidade ajustável e exportação direta para o rolo.
-            </p>
-          </div>
-          
-          <div className="flex justify-center mb-16">
-            <div className="w-[300px] h-[600px] border-4 border-neutral-800 rounded-[3rem] overflow-hidden relative shadow-2xl">
-              <div className="absolute inset-0 bg-gradient-to-br from-neutral-800 to-black"></div>
-              <div className="absolute top-4 left-1/2 -translate-x-1/2 w-1/3 h-6 bg-black rounded-b-xl z-20"></div>
-              <div className="absolute inset-x-4 inset-y-12 bg-neutral-900 rounded-2xl flex flex-col items-center justify-center p-6 border border-white/5">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-accent to-blue-900 mb-6 flex items-center justify-center">
-                  <div className="w-8 h-8 rounded-full border-2 border-white/50"></div>
-                </div>
-                <h3 className="font-bold text-xl mb-2">ColorLab</h3>
-                <p className="text-sm text-muted text-center mb-8">Selecione um preset para começar</p>
-                <div className="w-full space-y-3">
-                  {[1, 2, 3].map(i => (
-                    <div key={i} className="w-full h-12 bg-white/5 rounded-lg border border-white/5"></div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <div className="flex flex-col sm:flex-row justify-center gap-6">
-            <button className="liquid-glass px-8 py-4 rounded-full font-bold" data-testid="button-app-monthly">
-              R$49,90 / mês
-            </button>
-            <button className="liquid-glass-primary px-8 py-4 rounded-full font-bold" data-testid="button-app-yearly">
-              R$299,90 / ano
-            </button>
-          </div>
-        </Reveal>
-      </section>
 
-      {/* Stats */}
-      <section className="border-y border-white/10 py-16 bg-neutral-950 relative z-10 px-[var(--spacing-pad)]">
-        <div className="flex flex-wrap justify-between items-center max-w-7xl mx-auto gap-8 text-center sm:text-left">
-          {[
-            { v: "12.000+", l: "criadores" },
-            { v: "8", l: "produtos" },
-            { v: "4", l: "plataformas" },
-            { v: "1", l: "diretor" }
-          ].map((stat, i) => (
-            <Reveal key={i} delay={i * 0.1}>
-              <div>
-                <div className="text-3xl md:text-5xl font-bold mb-2 tracking-tight">{stat.v}</div>
-                <div className="text-eyebrow text-muted">{stat.l}</div>
-              </div>
-            </Reveal>
-          ))}
-        </div>
-      </section>
 
       {/* Footer */}
-      <footer className="pt-32 pb-8 px-[var(--spacing-pad)] bg-black relative z-10">
+      <footer className="pt-32 px-[var(--spacing-pad)] bg-black relative z-10">
         <Reveal>
-          <h2 className="text-footer mb-16 text-center lg:text-left">
-            LET'S<br/>CREATE.
+          <h2 className="text-footer mb-16 text-center lg:text-left" style={{ whiteSpace: "pre-line" }}>
+            {t("lets_create")}
           </h2>
-          <div className="flex flex-col md:flex-row justify-between items-center border-t border-white/10 pt-8 text-sm font-bold text-muted gap-4">
-            <div>© {new Date().getFullYear()} Diego Fontes. Todos os direitos reservados.</div>
-            <a href="https://instagram.com/diegofmurta" target="_blank" rel="noreferrer" className="hover:text-white transition-colors" data-testid="link-social">
-              @diegofmurta
-            </a>
-          </div>
         </Reveal>
       </footer>
+      <FooterSection />
     </div>
   );
 }
