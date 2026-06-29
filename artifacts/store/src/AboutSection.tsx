@@ -122,16 +122,6 @@ void main() {
   vec4 c1 = texture2D(u_img1, cuv);
   vec4 c2 = texture2D(u_img2, cuv);
 
-  // Saturation boost on the colour layer — compensates for WebGL
-  // not applying the image ICC profile (wide-gamut → sRGB mismatch).
-  // Remove this line once the image is re-exported in sRGB.
-  // Saturation + vibrance boost scaled by reveal strength
-  float luma = dot(c2.rgb, vec3(0.2126, 0.7152, 0.0722));
-  float sat   = mix(1.0, 3.5, reveal);          // 1× at rest → 3.5× at full reveal
-  c2.rgb = clamp(luma + sat * (c2.rgb - luma), 0.0, 1.0);
-  // Slight gamma lift to recover midtone punch lost in wide-gamut→sRGB conversion
-  c2.rgb = pow(c2.rgb, vec3(0.88));
-
   gl_FragColor = mix(c1, c2, reveal);
 }
 `.trim();

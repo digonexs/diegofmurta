@@ -5,7 +5,7 @@
   "hero_typewriter": "Não importa o que aconteça, mantenha-se sempre dedicado.",
   "before": "ANTES",
   "after": "DEPOIS",
-  "best_seller": "★ MELHOR VENDA",
+  "best_seller": "★ MAIS VENDIDO",
   "before_label": "ANTES",
   "after_label": "DEPOIS",
   "products_title": "O QUE OFEREÇO",
@@ -33,5 +33,6 @@
   "price_presets": "R$99",
   "price_sfx": "R$39",
   "price_bundle": "R$199",
-  "price_bundle_original": "R$287"
+  "price_bundle_original": "R$287",
+  "save": "ECONOMIZE {{percent}}%"
 }

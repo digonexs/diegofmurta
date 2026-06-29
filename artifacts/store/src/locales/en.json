@@ -33,5 +33,6 @@
   "price_presets": "$19",
   "price_sfx": "$8",
   "price_bundle": "$39",
-  "price_bundle_original": "$55"
+  "price_bundle_original": "$55",
+  "save": "SAVE {{percent}}%"
 }

@@ -559,7 +559,7 @@ export default function App() {
               <div className="flex items-center gap-4 mb-8">
                 <span className="text-4xl font-bold">{t("price_bundle")}</span>
                 <span className="text-muted line-through">{t("price_bundle_original")}</span>
-                <span className="liquid-glass px-3 py-1 text-xs font-bold text-accent rounded-full">SAVE 31%</span>
+                <span className="liquid-glass px-3 py-1 text-xs font-bold text-accent rounded-full">{t("save", { percent: 31 })}</span>
               </div>
               <button
                 className="w-full sm:w-auto liquid-glass-primary font-bold py-4 px-12 rounded-full"

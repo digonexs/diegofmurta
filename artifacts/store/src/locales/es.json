@@ -33,5 +33,6 @@
   "price_presets": "€17",
   "price_sfx": "€7",
   "price_bundle": "€36",
-  "price_bundle_original": "€50"
+  "price_bundle_original": "€50",
+  "save": "AHORRA {{percent}}%"
 }
