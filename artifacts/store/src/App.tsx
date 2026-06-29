@@ -339,8 +339,9 @@ const BeforeAfter = () => {
 const ProductCard = ({ p }: { p: typeof PRODUCTS_LIST[number] }) => {
   const { t } = useTranslation();
   return (
-    <div
-      className="group relative w-full aspect-square overflow-hidden rounded-2xl cursor-pointer"
+    <a
+      href={`/produto/${p.slug}`}
+      className="group relative w-full aspect-square overflow-hidden rounded-2xl cursor-pointer block"
       style={{ background: p.gradient }}
     >
       <div className="absolute inset-0" style={{ background: `radial-gradient(ellipse 70% 60% at 30% 35%, ${p.glow}, transparent 70%)` }} />
@@ -351,15 +352,12 @@ const ProductCard = ({ p }: { p: typeof PRODUCTS_LIST[number] }) => {
         <h3 className="font-bold text-base lg:text-lg leading-tight mb-4">{p.name}</h3>
         <div className="flex items-center justify-between">
           <div className="text-lg font-bold">{t(p.priceKey)}</div>
-          <a
-            href={`/produto/${p.slug}`}
-            className="liquid-glass px-4 py-1.5 rounded-full text-xs font-bold opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300"
-          >
+          <span className="liquid-glass px-4 py-1.5 rounded-full text-xs font-bold opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
             {t("see_more")}
-          </a>
+          </span>
         </div>
       </div>
-    </div>
+    </a>
   );
 };
 

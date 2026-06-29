@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
-import { motion, useInView, AnimatePresence } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 import { useTranslation } from "react-i18next";
 
 const LANGUAGES = [
@@ -238,17 +238,29 @@ export function ProductPage() {
   }
 
   const { i18n } = useTranslation();
-  const [menuOpen, setMenuOpen] = useState(false);
   const price = t(product.priceKey);
 
   return (
     <div className="bg-black text-white min-h-screen overflow-x-hidden" style={{ fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif" }}>
 
       {/* ── NAV ─────────────────────────────────────────────── */}
-      <nav className="fixed top-0 w-full z-40 px-[var(--spacing-pad)] py-6 flex items-center"
-        style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, transparent 100%)" }}>
-        {/* Camera icon + brand name — links home */}
-        <a href="/" className="text-brand flex items-center gap-2">
+      <nav
+        className="fixed top-0 w-full z-40 px-[var(--spacing-pad)] py-6 flex items-center justify-between"
+        style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0.7) 0%, transparent 100%)" }}
+      >
+        {/* Left — back link always visible */}
+        <a
+          href="/"
+          className="flex items-center gap-2 text-eyebrow text-white/50 hover:text-white transition-colors duration-300"
+        >
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-3.5 h-3.5 flex-shrink-0">
+            <path d="M10 3L5 8l5 5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          <span className="hidden sm:inline">BACK TO STORE</span>
+        </a>
+
+        {/* Center — camera icon + brand */}
+        <a href="/" className="text-brand flex items-center gap-2 absolute left-1/2 -translate-x-1/2">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="w-8 h-8">
             <path d="M15 12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h1.172a3 3 0 0 0 2.12-.879l.83-.828A1 1 0 0 1 6.827 3h2.344a1 1 0 0 1 .707.293l.828.828A3 3 0 0 0 12.828 5H14a1 1 0 0 1 1 1zM2 4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-1.172a2 2 0 0 1-1.414-.586l-.828-.828A2 2 0 0 0 9.172 2H6.828a2 2 0 0 0-1.414.586l-.828.828A2 2 0 0 1 3.172 4z"/>
             <path d="M8 11a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5m0 1a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7M3 6.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0"/>
@@ -256,31 +268,7 @@ export function ProductPage() {
           <span className="hidden sm:inline">DIEGO FONTES</span>
         </a>
 
-        {/* Back link — desktop center */}
-        <a
-          href="/"
-          className="hidden md:flex items-center gap-2 text-eyebrow text-white/40 hover:text-white transition-colors duration-300 absolute left-1/2 -translate-x-1/2"
-        >
-          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-3.5 h-3.5">
-            <path d="M10 3L5 8l5 5" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-          BACK TO STORE
-        </a>
-
-        {/* Hamburger — mobile */}
-        <button
-          className="md:hidden ml-auto flex flex-col gap-[5px] p-2 z-50"
-          onClick={() => setMenuOpen((v) => !v)}
-          aria-label="Menu"
-        >
-          <motion.span className="block w-6 h-px bg-white origin-center" animate={menuOpen ? { rotate: 45, y: 6 } : { rotate: 0, y: 0 }} transition={{ duration: 0.25 }} />
-          <motion.span className="block w-6 h-px bg-white" animate={menuOpen ? { opacity: 0 } : { opacity: 1 }} transition={{ duration: 0.15 }} />
-          <motion.span className="block w-6 h-px bg-white origin-center" animate={menuOpen ? { rotate: -45, y: -6 } : { rotate: 0, y: 0 }} transition={{ duration: 0.25 }} />
-        </button>
-      </nav>
-
-      {/* Language selector — desktop, fixed right */}
-      <div className="fixed top-0 right-[var(--spacing-pad)] z-50 py-4 hidden md:flex items-center">
+        {/* Right — language selector always visible */}
         <select
           value={i18n.language}
           onChange={(e) => i18n.changeLanguage(e.target.value)}
@@ -293,49 +281,7 @@ export function ProductPage() {
             </option>
           ))}
         </select>
-      </div>
-
-      {/* Mobile menu overlay */}
-      <AnimatePresence>
-        {menuOpen && (
-          <motion.div
-            className="fixed inset-0 z-30 bg-black flex flex-col items-center justify-center gap-10 md:hidden"
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3 }}
-          >
-            <motion.a
-              href="/"
-              className="text-section text-white"
-              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.05, duration: 0.35 }}
-            >
-              ← STORE
-            </motion.a>
-            <motion.a
-              href="#buy"
-              className="text-section text-white"
-              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1, duration: 0.35 }}
-              onClick={() => setMenuOpen(false)}
-            >
-              BUY NOW
-            </motion.a>
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
-              <select
-                value={i18n.language}
-                onChange={(e) => { i18n.changeLanguage(e.target.value); setMenuOpen(false); }}
-                className="bg-transparent border-none outline-none text-3xl cursor-pointer"
-                style={{ color: "white", WebkitAppearance: "none", appearance: "none" }}
-              >
-                {LANGUAGES.map(({ code, flag }) => (
-                  <option key={code} value={code} style={{ background: "#000", fontSize: "1rem" }}>
-                    {flag}
-                  </option>
-                ))}
-              </select>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      </nav>
 
       {/* ── HERO ─────────────────────────────────────────────── */}
       <section
