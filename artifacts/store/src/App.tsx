@@ -197,6 +197,7 @@ const PRODUCTS_LIST = [
     priceKey: "price_luts",
     gradient: "linear-gradient(145deg, #0f172a 0%, #064e3b 100%)",
     glow: "rgba(52,211,153,0.18)",
+    slug: "luts",
   },
   {
     id: 2,
@@ -205,6 +206,7 @@ const PRODUCTS_LIST = [
     priceKey: "price_presets",
     gradient: "linear-gradient(145deg, #1e1b4b 0%, #450a0a 100%)",
     glow: "rgba(167,139,250,0.18)",
+    slug: "presets",
   },
   {
     id: 3,
@@ -213,6 +215,7 @@ const PRODUCTS_LIST = [
     priceKey: "price_sfx",
     gradient: "linear-gradient(145deg, #18181b 0%, #292524 100%)",
     glow: "rgba(251,146,60,0.18)",
+    slug: "sfx",
   },
 ];
 
@@ -222,111 +225,225 @@ const afterGradient =
   "linear-gradient(160deg, #0d2622 0%, #0a1a2e 35%, #1a0a0a 65%, #2b1500 100%)";
 
 const BeforeAfter = () => {
-  const [active, setActive] = useState<"before" | "after">("before");
   const { t } = useTranslation();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [sliderPos, setSliderPos] = useState(50); // 0–100, % from left
+  const draggingRef = useRef(false);
+
+  const updateFromClientX = (clientX: number) => {
+    const el = containerRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const pct = ((clientX - rect.left) / rect.width) * 100;
+    setSliderPos(Math.min(100, Math.max(0, pct)));
+  };
+
+  const onPointerDown = (e: React.PointerEvent) => {
+    draggingRef.current = true;
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    updateFromClientX(e.clientX);
+  };
+  const onPointerMove = (e: React.PointerEvent) => {
+    if (!draggingRef.current) return;
+    updateFromClientX(e.clientX);
+  };
+  const onPointerUp = () => {
+    draggingRef.current = false;
+  };
 
   return (
     <div className="flex flex-col items-center gap-6 w-full mb-20" data-testid="section-before-after">
-      {/* Toggle */}
-      <div
-        className="liquid-glass relative flex items-center rounded-full p-1 gap-0"
-        data-testid="toggle-before-after"
-      >
-        {(["before", "after"] as const).map((val) => {
-          const isActive = active === val;
-          return (
-            <button
-              key={val}
-              onClick={() => setActive(val)}
-              data-testid={`button-toggle-${val}`}
-              className="relative z-10 px-8 py-2 rounded-full text-eyebrow transition-colors duration-300"
-              style={{ color: isActive ? "#000" : "oklch(0.72 0.004 80)" }}
-            >
-              {isActive && (
-                <motion.span
-                  layoutId="toggle-pill"
-                  className="absolute inset-0 rounded-full bg-white z-[-1]"
-                  transition={{ type: "spring", stiffness: 400, damping: 35 }}
-                />
-              )}
-              {val === "before" ? t("before") : t("after")}
-            </button>
-          );
-        })}
-      </div>
-
       {/* Container */}
       <div
-        className="relative w-full max-w-6xl mx-auto overflow-hidden rounded-sm"
+        ref={containerRef}
+        className="relative w-full max-w-6xl mx-auto overflow-hidden rounded-sm select-none touch-none cursor-ew-resize"
         style={{ aspectRatio: "16/9" }}
         data-testid="container-before-after"
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+        onPointerCancel={onPointerUp}
       >
-        {/* Label */}
-        <div className="absolute top-4 left-4 z-20 text-eyebrow text-white/60 select-none">
-          {active === "before" ? t("before_label") : t("after_label")}
+        {/* AFTER — base layer, full width */}
+        <div className="absolute inset-0" data-testid="visual-after">
+          <div className="w-full h-full" style={{ background: afterGradient }} />
+          {/* Cinematic teal-orange split light */}
+          <div className="absolute inset-0"
+            style={{ background: "radial-gradient(ellipse 60% 80% at 25% 60%, rgba(0,180,140,0.18) 0%, transparent 70%)" }}
+          />
+          <div className="absolute inset-0"
+            style={{ background: "radial-gradient(ellipse 50% 70% at 78% 40%, rgba(200,100,20,0.22) 0%, transparent 65%)" }}
+          />
+          {/* Vignette */}
+          <div className="absolute inset-0"
+            style={{ background: "radial-gradient(ellipse 100% 100% at 50% 50%, transparent 40%, rgba(0,0,0,0.72) 100%)" }}
+          />
+          {/* Film grain */}
+          <div className="absolute inset-0 opacity-[0.09] mix-blend-overlay"
+            style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E\")", backgroundSize: "300px 300px" }}
+          />
+          {/* "GRADED" badge */}
+          <div className="absolute bottom-4 right-4 text-eyebrow" style={{ color: "oklch(0.72 0.16 145)" }}>
+            BENIZGRADE
+          </div>
+          <div className="absolute top-4 right-4 z-20 text-eyebrow text-white/60">
+            {t("after_label")}
+          </div>
         </div>
 
-        <AnimatePresence mode="wait">
-          {active === "before" ? (
-            <motion.div
-              key="before"
-              className="absolute inset-0"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.55, ease: [0.2, 0.7, 0.2, 1] }}
-              data-testid="visual-before"
-            >
-              <div className="w-full h-full" style={{ background: beforeGradient }} />
-              {/* Flat, desaturated film grain overlay */}
-              <div className="absolute inset-0 opacity-[0.07]"
-                style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E\")", backgroundSize: "300px 300px" }}
-              />
-              {/* Waveform / exposure grid lines */}
-              <div className="absolute inset-0 flex flex-col justify-center items-center gap-3 px-12 opacity-10">
-                {[...Array(6)].map((_, i) => (
-                  <div key={i} className="w-full h-px bg-white" style={{ opacity: 0.4 + i * 0.08 }} />
-                ))}
-              </div>
-              {/* "RAW" badge */}
-              <div className="absolute bottom-4 right-4 text-eyebrow text-white/30">RAW / LOG-C3</div>
-            </motion.div>
-          ) : (
-            <motion.div
-              key="after"
-              className="absolute inset-0"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.55, ease: [0.2, 0.7, 0.2, 1] }}
-              data-testid="visual-after"
-            >
-              <div className="w-full h-full" style={{ background: afterGradient }} />
-              {/* Cinematic teal-orange split light */}
-              <div className="absolute inset-0"
-                style={{ background: "radial-gradient(ellipse 60% 80% at 25% 60%, rgba(0,180,140,0.18) 0%, transparent 70%)" }}
-              />
-              <div className="absolute inset-0"
-                style={{ background: "radial-gradient(ellipse 50% 70% at 78% 40%, rgba(200,100,20,0.22) 0%, transparent 65%)" }}
-              />
-              {/* Vignette */}
-              <div className="absolute inset-0"
-                style={{ background: "radial-gradient(ellipse 100% 100% at 50% 50%, transparent 40%, rgba(0,0,0,0.72) 100%)" }}
-              />
-              {/* Film grain */}
-              <div className="absolute inset-0 opacity-[0.09] mix-blend-overlay"
-                style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E\")", backgroundSize: "300px 300px" }}
-              />
-              {/* "GRADED" badge */}
-              <div className="absolute bottom-4 right-4 text-eyebrow" style={{ color: "oklch(0.72 0.16 145)" }}>
-                BENIZGRADE
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {/* BEFORE — clipped to slider position */}
+        <div
+          className="absolute inset-0"
+          style={{ clipPath: `inset(0 ${100 - sliderPos}% 0 0)` }}
+          data-testid="visual-before"
+        >
+          <div className="w-full h-full" style={{ background: beforeGradient }} />
+          {/* Flat, desaturated film grain overlay */}
+          <div className="absolute inset-0 opacity-[0.07]"
+            style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E\")", backgroundSize: "300px 300px" }}
+          />
+          {/* Waveform / exposure grid lines */}
+          <div className="absolute inset-0 flex flex-col justify-center items-center gap-3 px-12 opacity-10">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="w-full h-px bg-white" style={{ opacity: 0.4 + i * 0.08 }} />
+            ))}
+          </div>
+          {/* "RAW" badge */}
+          <div className="absolute bottom-4 right-4 text-eyebrow text-white/30">RAW / LOG-C3</div>
+          <div className="absolute top-4 left-4 z-20 text-eyebrow text-white/60">
+            {t("before_label")}
+          </div>
+        </div>
+
+        {/* Drag handle */}
+        <div
+          className="absolute top-0 bottom-0 z-30 w-px bg-white/80 pointer-events-none"
+          style={{ left: `${sliderPos}%` }}
+        >
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white shadow-lg flex items-center justify-center">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+              <path d="M8 7l-5 5 5 5" />
+              <path d="M16 7l5 5-5 5" />
+            </svg>
+          </div>
+        </div>
 
         {/* Border frame */}
         <div className="absolute inset-0 border border-white/10 pointer-events-none rounded-sm" />
+      </div>
+    </div>
+  );
+};
+
+// ── Product card (shared between carousel and desktop grid) ──
+const ProductCard = ({ p }: { p: typeof PRODUCTS_LIST[number] }) => {
+  const { t } = useTranslation();
+  return (
+    <div
+      className="group relative w-full aspect-square overflow-hidden rounded-2xl cursor-pointer"
+      style={{ background: p.gradient }}
+    >
+      <div className="absolute inset-0" style={{ background: `radial-gradient(ellipse 70% 60% at 30% 35%, ${p.glow}, transparent 70%)` }} />
+      <div className="absolute inset-0 opacity-[0.06]" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E\")", backgroundSize: "200px" }} />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
+      <div className="absolute inset-0 p-5 flex flex-col justify-end">
+        <div className="text-eyebrow mb-1.5 text-white/50">{t(p.categoryKey)}</div>
+        <h3 className="font-bold text-base lg:text-lg leading-tight mb-4">{p.name}</h3>
+        <div className="flex items-center justify-between">
+          <div className="text-lg font-bold">{t(p.priceKey)}</div>
+          <a
+            href={`/produto/${p.slug}`}
+            className="liquid-glass px-4 py-1.5 rounded-full text-xs font-bold opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300"
+          >
+            {t("see_more")}
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ── Mobile carousel ───────────────────────────────────────────
+const ProductsCarousel = () => {
+  const [active, setActive] = useState(0);
+  const dragStartX = useRef(0);
+  const total = PRODUCTS_LIST.length;
+
+  const prev = () => setActive((i) => Math.max(0, i - 1));
+  const next = () => setActive((i) => Math.min(total - 1, i + 1));
+
+  const onDragStart = (_: unknown, info: { point: { x: number } }) => {
+    dragStartX.current = info.point.x;
+  };
+  const onDragEnd = (_: unknown, info: { offset: { x: number } }) => {
+    if (info.offset.x < -40) next();
+    else if (info.offset.x > 40) prev();
+  };
+
+  return (
+    <div className="lg:hidden max-w-sm mx-auto w-full">
+      {/* Track */}
+      <div className="overflow-hidden rounded-2xl">
+        <motion.div
+          className="flex"
+          animate={{ x: `-${active * 100}%` }}
+          transition={{ type: "spring", stiffness: 320, damping: 32 }}
+          drag="x"
+          dragConstraints={{ left: 0, right: 0 }}
+          dragElastic={0.08}
+          onDragStart={onDragStart}
+          onDragEnd={onDragEnd}
+        >
+          {PRODUCTS_LIST.map((p) => (
+            <div key={p.id} className="w-full flex-shrink-0">
+              <ProductCard p={p} />
+            </div>
+          ))}
+        </motion.div>
+      </div>
+
+      {/* Controls */}
+      <div className="flex items-center justify-between mt-5 px-1">
+        {/* Prev arrow */}
+        <button
+          onClick={prev}
+          disabled={active === 0}
+          className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center transition-opacity duration-200 disabled:opacity-20"
+          aria-label="Previous"
+        >
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-4 h-4">
+            <path d="M10 3L5 8l5 5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
+
+        {/* Dots */}
+        <div className="flex gap-2 items-center">
+          {PRODUCTS_LIST.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setActive(i)}
+              className="rounded-full transition-all duration-300"
+              style={{
+                width: i === active ? "20px" : "6px",
+                height: "6px",
+                background: i === active ? "white" : "rgba(255,255,255,0.3)",
+              }}
+              aria-label={`Go to product ${i + 1}`}
+            />
+          ))}
+        </div>
+
+        {/* Next arrow */}
+        <button
+          onClick={next}
+          disabled={active === total - 1}
+          className="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center transition-opacity duration-200 disabled:opacity-20"
+          aria-label="Next"
+        >
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-4 h-4">
+            <path d="M6 3l5 5-5 5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
       </div>
     </div>
   );
@@ -508,33 +625,14 @@ export default function App() {
         <Reveal>
           <h2 className="text-section mb-24">{t("products_title")}</h2>
         </Reveal>
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-8 max-w-7xl mx-auto w-full">
+        {/* ── Mobile carousel ────────────────────────────────── */}
+        <ProductsCarousel />
+
+        {/* ── Desktop grid ───────────────────────────────────── */}
+        <div className="hidden lg:grid grid-cols-3 gap-8 max-w-7xl mx-auto w-full">
           {PRODUCTS_LIST.map((p, i) => (
             <Reveal key={p.id} delay={i * 0.08}>
-              <div
-                className="group relative w-full aspect-square overflow-hidden rounded-2xl cursor-pointer"
-                style={{ background: p.gradient }}
-              >
-                {/* Glow */}
-                <div className="absolute inset-0" style={{ background: `radial-gradient(ellipse 70% 60% at 30% 35%, ${p.glow}, transparent 70%)` }} />
-                {/* Noise */}
-                <div className="absolute inset-0 opacity-[0.06]" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E\")", backgroundSize: "200px" }} />
-                {/* Bottom scrim */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
-
-                <div className="absolute inset-0 p-5 flex flex-col justify-end">
-                  <div className="text-eyebrow mb-1.5 text-white/50">{t(p.categoryKey)}</div>
-                  <h3 className="font-bold text-base lg:text-lg leading-tight mb-4">{p.name}</h3>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="text-lg font-bold">{t(p.priceKey)}</div>
-                    </div>
-                    <button className="liquid-glass px-4 py-1.5 rounded-full text-xs font-bold opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
-                      {t("see_more")}
-                    </button>
-                  </div>
-                </div>
-              </div>
+              <ProductCard p={p} />
             </Reveal>
           ))}
         </div>
